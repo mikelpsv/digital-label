@@ -1,13 +1,3 @@
-CREATE ROLE wibuser WITH LOGIN PASSWORD 'wibpass';
-
-
-CREATE DATABASE wibdb
-    WITH
-    OWNER = wibuser
-    ENCODING = 'UTF8'
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
 CREATE TABLE data_links
 (
     key_link varchar(36)  default ''::character varying not null
@@ -20,4 +10,4 @@ CREATE TABLE data_links
 );
 
 ALTER TABLE data_links
-    OWNER TO wibuser;
+    OWNER TO dglabeluser;

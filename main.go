@@ -104,7 +104,6 @@ func StartHttpServer(Ip string, Port string, Router *mux.Router, deferFunc func(
 }
 
 func CloseAll() {
-
 	if err := app.Db.Close(); err != nil {
 		app.Log.Error.Fatalf("database close failed:%+v", err)
 	}
