@@ -2,28 +2,27 @@ package main
 
 import (
 	"context"
+	"digital-label/conf"
+	"digital-label/model"
+	"digital-label/routes"
 	"fmt"
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
+	"github.com/segmentio/kafka-go"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"wib-project/conf"
-	"wib-project/routes"
 )
 
-var StopAllTasks chan bool
-
 func main() {
-	StopAllTasks = make(chan bool)
-
+	ctx, cancel := context.WithCancel(context.Background())
+	app.Log.Init("", "")
 	conf.ReadEnv()
 
-	app.Log.Init("", "")
-
 	app.InitDb(conf.Cfg.DbHost, conf.Cfg.DbName, conf.Cfg.DbUser, conf.Cfg.DbPassword)
+	defer app.Db.Close()
 
 	wHandlers := routes.NewWrapHandlers()
 	wHandlers.Log = routes.WrapHttpLog{
@@ -39,7 +38,52 @@ func main() {
 	router := NewRouter(routeItems)
 	router.NotFoundHandler = http.HandlerFunc(wHandlers.Custom404)
 
-	StartHttpServer(conf.Cfg.AppAddr, conf.Cfg.AppPort, router, CloseAll)
+	go func() {
+		reader := kafka.NewReader(kafka.ReaderConfig{
+			Brokers:         []string{"127.0.0.1:9093"},
+			GroupID:         "digital_label",
+			Topic:           "my-topic",
+			MinBytes:        10e3, // 10KB
+			MaxBytes:        10e6, // 10MB
+			ReadLagInterval: 500 * time.Millisecond,
+		})
+		defer reader.Close()
+		for {
+			msg, err := reader.ReadMessage(ctx)
+			if err != nil {
+				fmt.Println(err)
+			}
+			code, err := model.ConvertMessage(msg)
+			err = code.Write()
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+	}()
+
+	server := &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", conf.Cfg.AppAddr, conf.Cfg.AppPort),
+		Handler: router,
+	}
+
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			app.Log.Error.Fatal(err)
+		}
+	}()
+
+	sigterm := make(chan os.Signal, 1)
+	signal.Notify(sigterm, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+	<-sigterm
+
+	cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		app.Log.Error.Fatalf("server shutdown failed:%+v", err)
+	}
+
+	time.Sleep(5 * time.Second)
 }
 
 func RegisterHandlers(routeItems app.Routes, wh *routes.WrapHttpHandlers) app.Routes {
@@ -71,41 +115,4 @@ func NewRouter(routeItems app.Routes) *mux.Router {
 	}
 
 	return router
-}
-
-func StartHttpServer(Ip string, Port string, Router *mux.Router, deferFunc func()) {
-	app.Log.Info.Printf("Starting Api server on %s:%s", Ip, Port)
-	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%s", Ip, Port),
-		Handler: Router,
-	}
-
-	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			app.Log.Error.Fatal(err)
-		}
-	}()
-
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
-	<-sigterm
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		app.Log.Error.Fatalf("server shutdown failed:%+v", err)
-	}
-	if deferFunc != nil {
-		deferFunc()
-	}
-
-	app.Log.Info.Printf("Stopped Api server on %s port", Port)
-}
-
-func CloseAll() {
-	if err := app.Db.Close(); err != nil {
-		app.Log.Error.Fatalf("database close failed:%+v", err)
-	}
-	app.Log.Info.Println("Bye!")
 }

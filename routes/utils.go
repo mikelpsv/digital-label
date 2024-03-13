@@ -1,11 +1,11 @@
 package routes
 
 import (
+	"digital-label/model"
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"net/http"
 	"strconv"
-	"wib-project/model"
 )
 
 func RegisterUtilsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {

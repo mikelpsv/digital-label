@@ -1,19 +1,22 @@
 package routes
 
 import (
+	"digital-label/model"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"html/template"
 	"net/http"
-	"wib-project/model"
 )
 
 type ViewData struct {
-	Title    string `json:"title"`
-	OrderNum string `json:"order_num"`
-	Client   string `json:"client"`
-	Address  string `json:"address"`
+	Owner     string `json:"owner"`
+	Title     string `json:"title"`
+	OrderNum  string `json:"order_num"`
+	Client    string `json:"client"`
+	Address   string `json:"address"`
+	BoxNumber string `json:"box_number"`
+	BoxOneOf  int    `json:"box_one_of"`
 }
 
 func RegisterDataHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
@@ -29,24 +32,39 @@ func RegisterDataHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) ap
 }
 
 func (wh *WrapHttpHandlers) GetData(w http.ResponseWriter, r *http.Request) {
+	scheme := r.URL.Query().Get("raw")
 	p := mux.Vars(r)
 	link := p["key_link"]
 	if link == "" {
-		// ошибку нарисовать
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Данные по запросу не найдены"))
+		return
 	}
 
 	code := new(model.Code)
 	err := code.Get(link)
 	if err != nil {
-		// ошибку нарисовать
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Данные по запросу не найдены"))
+		return
 	}
-	data := new(ViewData)
-	_ = json.Unmarshal([]byte(code.Payload), data)
-	data.Title = "Просто текст"
-	data.Client = "ООО Клиент"
-	data.Address = "660077, Красноярский край, Красноярск г, Весны ул, дом № 11"
-	var tmpl, _ = template.ParseFiles("templates/type1.html")
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_ = tmpl.Execute(w, data)
 
+	if scheme == "" {
+		data := new(ViewData)
+		err = json.Unmarshal([]byte(code.Payload), data)
+		var tmpl, _ = template.ParseFiles("templates/type1.html")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Ошибка отображения данных"))
+			return
+		}
+	} else {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.Write([]byte(code.Payload))
+	}
 }
