@@ -4,8 +4,8 @@ CREATE TABLE data_links
         constraint data_links_pk
             primary key,
     key_data varchar(150) default ''::character varying,
-    created_at timestamptz
-    type     integer      default 0                     not null,
+    created_at timestamptz,
+    data_type     integer      default 0                     not null,
     payload  jsonb                                      not null
 );
 

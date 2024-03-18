@@ -40,9 +40,9 @@ func main() {
 
 	go func() {
 		reader := kafka.NewReader(kafka.ReaderConfig{
-			Brokers:         []string{"127.0.0.1:9093"},
-			GroupID:         "digital_label",
-			Topic:           "my-topic",
+			Brokers:         []string{conf.Cfg.KafkaHost0},
+			GroupID:         conf.Cfg.KafkaDataGroup,
+			Topic:           conf.Cfg.KafkaDataTopic,
 			MinBytes:        10e3, // 10KB
 			MaxBytes:        10e6, // 10MB
 			ReadLagInterval: 500 * time.Millisecond,

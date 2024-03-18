@@ -8,15 +8,18 @@ import (
 )
 
 type AppCfg struct {
-	EnvProduction bool
-	EnvLocal      bool
-	AppAddr       string
-	AppPort       string
-	DbHost        string
-	DbPort        string
-	DbName        string
-	DbUser        string
-	DbPassword    string
+	EnvProduction  bool
+	EnvLocal       bool
+	AppAddr        string
+	AppPort        string
+	DbHost         string
+	DbPort         string
+	DbName         string
+	DbUser         string
+	DbPassword     string
+	KafkaHost0     string
+	KafkaDataTopic string
+	KafkaDataGroup string
 }
 
 var Cfg AppCfg
@@ -38,6 +41,11 @@ func ReadEnv() {
 	Cfg.DbName = os.Getenv("DB_NAME")
 	Cfg.DbUser = os.Getenv("DB_USER")
 	Cfg.DbPassword = os.Getenv("DB_PASS")
+
+	Cfg.KafkaHost0 = os.Getenv("KAFKA_BROKER0_HOST")
+	Cfg.KafkaDataGroup = os.Getenv("KAFKA_DATA_GROUP")
+	Cfg.KafkaDataTopic = os.Getenv("KAFKA_DATA_TOPIC")
+
 }
 
 func ReadIntValue(envString string, defVal int) (int, error) {
