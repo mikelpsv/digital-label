@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"digital-label/conf"
-	"digital-label/model"
-	"digital-label/routes"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mikelpsv/digital-label/pkg/config"
+	"github.com/mikelpsv/digital-label/pkg/model"
+	routes2 "github.com/mikelpsv/digital-label/pkg/routes"
 	app "github.com/mlplabs/app-utils"
 	"github.com/segmentio/kafka-go"
 	"net/http"
@@ -19,13 +19,13 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	app.Log.Init("", "")
-	conf.ReadEnv()
+	config.ReadEnv()
 
-	app.InitDb(conf.Cfg.DbHost, conf.Cfg.DbName, conf.Cfg.DbUser, conf.Cfg.DbPassword)
+	app.InitDb(config.Cfg.DbHost, config.Cfg.DbName, config.Cfg.DbUser, config.Cfg.DbPassword)
 	defer app.Db.Close()
 
-	wHandlers := routes.NewWrapHandlers()
-	wHandlers.Log = routes.WrapHttpLog{
+	wHandlers := routes2.NewWrapHandlers()
+	wHandlers.Log = routes2.WrapHttpLog{
 		Trace:   app.Log.Trace,
 		Info:    app.Log.Info,
 		Warning: app.Log.Warning,
@@ -40,9 +40,9 @@ func main() {
 
 	go func() {
 		reader := kafka.NewReader(kafka.ReaderConfig{
-			Brokers:         []string{conf.Cfg.KafkaHost0},
-			GroupID:         conf.Cfg.KafkaDataGroup,
-			Topic:           conf.Cfg.KafkaDataTopic,
+			Brokers:         []string{config.Cfg.KafkaHost0},
+			GroupID:         config.Cfg.KafkaDataGroup,
+			Topic:           config.Cfg.KafkaDataTopic,
 			MinBytes:        10e3, // 10KB
 			MaxBytes:        10e6, // 10MB
 			ReadLagInterval: 500 * time.Millisecond,
@@ -63,7 +63,7 @@ func main() {
 	}()
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%s", conf.Cfg.AppAddr, conf.Cfg.AppPort),
+		Addr:    fmt.Sprintf("%s:%s", config.Cfg.AppAddr, config.Cfg.AppPort),
 		Handler: router,
 	}
 
@@ -86,10 +86,10 @@ func main() {
 	time.Sleep(5 * time.Second)
 }
 
-func RegisterHandlers(routeItems app.Routes, wh *routes.WrapHttpHandlers) app.Routes {
-	routeItems = routes.RegisterControlHandlers(routeItems, wh)
-	routeItems = routes.RegisterUtilsHandlers(routeItems, wh)
-	routeItems = routes.RegisterDataHandlers(routeItems, wh)
+func RegisterHandlers(routeItems app.Routes, wh *routes2.WrapHttpHandlers) app.Routes {
+	routeItems = routes2.RegisterControlHandlers(routeItems, wh)
+	routeItems = routes2.RegisterUtilsHandlers(routeItems, wh)
+	routeItems = routes2.RegisterDataHandlers(routeItems, wh)
 
 	return routeItems
 }
@@ -100,7 +100,7 @@ func NewRouter(routeItems app.Routes) *mux.Router {
 	for _, route := range routeItems {
 		handlerFunc := route.HandlerFunc
 		if route.ValidateToken {
-			handlerFunc = routes.SetMiddlewareApiKey(handlerFunc)
+			handlerFunc = routes2.SetMiddlewareApiKey(handlerFunc)
 		}
 
 		if route.SetHeaderJSON {
