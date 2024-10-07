@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"digital-label/model"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/mikelpsv/digital-label/pkg/model"
 	app "github.com/mlplabs/app-utils"
 	"html/template"
 	"net/http"
