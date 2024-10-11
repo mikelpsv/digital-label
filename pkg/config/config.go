@@ -4,10 +4,9 @@ import (
 	"github.com/joho/godotenv"
 	app "github.com/mlplabs/app-utils"
 	"os"
-	"strconv"
 )
 
-type AppCfg struct {
+type Service struct {
 	EnvProduction  bool
 	EnvLocal       bool
 	AppAddr        string
@@ -22,9 +21,8 @@ type AppCfg struct {
 	KafkaDataGroup string
 }
 
-var Cfg AppCfg
-
-func ReadEnv() {
+func ReadEnv() *Service {
+	var Cfg Service
 	err := godotenv.Load()
 	if err != nil {
 		app.Log.Error.Println("error reading .env file")
@@ -45,13 +43,5 @@ func ReadEnv() {
 	Cfg.KafkaHost0 = os.Getenv("KAFKA_BROKER0_HOST")
 	Cfg.KafkaDataGroup = os.Getenv("KAFKA_DATA_GROUP")
 	Cfg.KafkaDataTopic = os.Getenv("KAFKA_DATA_TOPIC")
-
-}
-
-func ReadIntValue(envString string, defVal int) (int, error) {
-	val, err := strconv.Atoi(envString)
-	if err != nil {
-		return defVal, err
-	}
-	return val, nil
+	return &Cfg
 }

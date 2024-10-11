@@ -1,0 +1,69 @@
+version: "3.8"
+name: digital-label
+services:
+  dl:
+    container_name: service-dl
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - '8999:8999'
+    networks:
+      - db-network
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    container_name: database-dl
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      retries: 50
+      timeout: 10s
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./utils/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+    networks:
+      - db-network
+    env_file:
+      - .env
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-dl
+    ports:
+      - '8888:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'pgadmin@local.host'
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+    networks:
+      - db-network
+    env_file:
+      - .env
+
+  migrate:
+    image: migrate/migrate
+    container_name: migrate-dl
+    volumes:
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://${DB_USER}:${DB_PASS}@database-dl:5432/${DB_NAME}?sslmode=disable", "up", "3"]
+    depends_on:
+      db:
+        condition: service_healthy
+      dl:
+        condition: service_started
+    networks:
+       - db-network
+    env_file:
+      - .env
+
+networks:
+  db-network:
+    driver: bridge
+volumes:
+  db-data:

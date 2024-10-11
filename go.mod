@@ -2,6 +2,8 @@ module github.com/mikelpsv/digital-label
 
 go 1.23.0
 
+replace github.com/mlplabs/app-utils => github.com/mlplabs/app-utils v0.0.3002
+
 require (
 	github.com/gorilla/mux v1.8.1
 	github.com/joho/godotenv v1.5.1

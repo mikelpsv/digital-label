@@ -1,9 +1,6 @@
-CREATE ROLE dglabeluser WITH LOGIN PASSWORD 'dglabelpass';
-
-
-CREATE DATABASE dglabeldb
+CREATE DATABASE digital_label
     WITH
-    OWNER = dglabeluser
+    OWNER = dl_user
     ENCODING = 'UTF8'
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;

@@ -7,6 +7,17 @@ import (
 	"net/http"
 )
 
+type PingResponse struct {
+	Status      string `json:"status"`
+	Code        int    `json:"code"`
+	Description string `json:"-"`
+	Version     string `json:"version"`
+}
+
+type HealthResponse struct {
+	Database bool `json:"database"`
+}
+
 type WrapHttpLog struct {
 	Trace   *log.Logger
 	Info    *log.Logger

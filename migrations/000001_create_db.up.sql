@@ -10,4 +10,6 @@ CREATE TABLE data_links
 );
 
 ALTER TABLE data_links
-    OWNER TO dglabeluser;
+    OWNER TO dl_user;
+
+INSERT INTO data_links (key_link, created_at, payload) VALUES ('123', now(), '{}');
