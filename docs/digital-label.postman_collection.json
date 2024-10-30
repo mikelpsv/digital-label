@@ -1,0 +1,97 @@
+{
+	"info": {
+		"_postman_id": "31717bc7-4023-438b-afc2-8247a673116a",
+		"name": "digital-label",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2884415",
+		"_collection_link": "https://ecom3plteam.postman.co/workspace/ECOMMERCE~50b32a2b-f231-4dfe-a49f-e731c22e6371/collection/2884415-31717bc7-4023-438b-afc2-8247a673116a?action=share&source=collection_link&creator=2884415"
+	},
+	"item": [
+		{
+			"name": "write-data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"key_link\":\"cuMPS\",\n\t\"payload\":\"{\\\"title\\\":\\\"test\\\",\\\"order_num\\\":\\\"123456\\\",\\\"client\\\":\\\"ООО 'Ромашка\\\",\\\"address\\\":\\\"Москва, Тверская ул, д.1\\\",\\\"box_label\\\":\\\"5433532\\\",\\\"box_number\\\":2,\\\"box_one_of\\\":4}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8998/write",
+					"host": [
+						"localhost"
+					],
+					"port": "8998",
+					"path": [
+						"write"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-link",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8998/l/cvcQM",
+					"host": [
+						"localhost"
+					],
+					"port": "8998",
+					"path": [
+						"l",
+						"cvcQM"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "decode",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8998/utils/decode/cvcQM",
+					"host": [
+						"localhost"
+					],
+					"port": "8998",
+					"path": [
+						"utils",
+						"decode",
+						"cvcQM"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "encode",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8998/utils/encode/0034567890",
+					"host": [
+						"localhost"
+					],
+					"port": "8998",
+					"path": [
+						"utils",
+						"encode",
+						"0034567890"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

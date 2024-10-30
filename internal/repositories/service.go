@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"github.com/mikelpsv/digital-label/pkg/repositories/dbo"
+	"github.com/mikelpsv/digital-label/internal/repositories/dbo"
 	"time"
 )
 
@@ -18,16 +18,17 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 
 func (r *ServiceRepository) GetLink(keyLink string) (*dbo.LinkData, error) {
 	ld := dbo.LinkData{}
-	sqlGet := "SELECT key_data, data_type, payload FROM data_links WHERE key_link = $1"
+	sqlGet := "SELECT key_link, key_data, data_type, payload FROM data_links WHERE key_link = $1"
 	rows, err := r.Db.Query(sqlGet, keyLink)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	rows.Next()
-	err = rows.Scan(&ld.KeyData, &ld.Type, &ld.Payload)
-	if err != nil {
-		return nil, err
+	for rows.Next() {
+		err = rows.Scan(&ld.KeyLink, &ld.KeyData, &ld.Type, &ld.Payload)
+		if err != nil {
+			return &ld, err
+		}
 	}
 	return &ld, nil
 }

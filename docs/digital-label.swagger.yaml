@@ -1,0 +1,102 @@
+info:
+  title: digital-label
+  version: 1.0.0
+  
+openapi: 3.0.0
+
+servers:
+- description: ' prod'
+  url: http://localhost:8998
+
+tags:
+- name: "Общее"
+- name: "Утилиты"
+
+paths:
+  /l/{linkData}:
+    get:
+      tags:
+        - "Общее"
+      summary: возвращает информацию о коробе
+      parameters:
+        - name: linkData
+          description: сокращенный идентификатор короба
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+  /write:
+    post:
+      tags:
+        - "Общее"
+      summary: запись информации о коробе
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkData'       
+      responses:
+        200:
+          description: OK
+
+  /encode/{num}:
+    get:
+      tags:
+        - "Утилиты"
+      summary: кодирует число в короткую ссылку
+      parameters:
+        - name: num
+          in: path
+          required: true
+          schema:
+            type: string      
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseData'
+                
+  /decode/{link}:
+    get:
+      tags:
+        - "Утилиты"
+      summary: декодирует короткую ссылку в число
+      parameters:
+        - name: link
+          in: path
+          required: true
+          schema:
+            type: string        
+      responses:
+        200:
+          description: OK   
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseData'    
+
+components:
+  schemas:
+    LinkData:
+      type: object
+      properties:
+        key_link:
+          type: string
+          description: сокращенный идентификатор короба
+          example: 'cvcQM'
+        payload:
+          type: string
+          format: json
+          example: '{"title":"Заголовок","order_num":"Номер заказа","client":"ООО клиент","address":"Адрес клиента","box_label":"ID короба","box_number":2,"box_one_of":4}'
+          description: данные для отображения. строка должна быть валидным json, минимум `{}`
+
+    ResponseData:
+      type: object
+      properties:
+        data:
+          type: string

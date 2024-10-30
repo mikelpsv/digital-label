@@ -3,8 +3,8 @@ package service_utils
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mikelpsv/digital-label/internal/usecase"
 	"github.com/mikelpsv/digital-label/pkg/model"
-	"github.com/mikelpsv/digital-label/pkg/usecase"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/app-utils/pkg/http/errors"
 	resp "github.com/mlplabs/app-utils/pkg/http/response"

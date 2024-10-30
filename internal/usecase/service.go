@@ -1,8 +1,8 @@
 package usecase
 
 import (
+	"github.com/mikelpsv/digital-label/internal/repositories"
 	"github.com/mikelpsv/digital-label/pkg/model"
-	"github.com/mikelpsv/digital-label/pkg/repositories"
 )
 
 type Service struct {
