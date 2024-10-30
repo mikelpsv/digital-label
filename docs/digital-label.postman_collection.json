@@ -22,11 +22,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8998/write",
+					"raw": "localhost:8999/write",
 					"host": [
 						"localhost"
 					],
-					"port": "8998",
+					"port": "8999",
 					"path": [
 						"write"
 					]
@@ -40,14 +40,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8998/l/cvcQM",
+					"raw": "localhost:8999/l/cuMPS",
 					"host": [
 						"localhost"
 					],
-					"port": "8998",
+					"port": "8999",
 					"path": [
 						"l",
-						"cvcQM"
+						"cuMPS"
 					]
 				}
 			},
@@ -59,11 +59,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8998/utils/decode/cvcQM",
+					"raw": "localhost:8999/utils/decode/cvcQM",
 					"host": [
 						"localhost"
 					],
-					"port": "8998",
+					"port": "8999",
 					"path": [
 						"utils",
 						"decode",

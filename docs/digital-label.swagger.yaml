@@ -6,7 +6,7 @@ openapi: 3.0.0
 
 servers:
 - description: ' prod'
-  url: http://localhost:8998
+  url: http://localhost:8999
 
 tags:
 - name: "Общее"
@@ -42,7 +42,7 @@ paths:
         200:
           description: OK
 
-  /encode/{num}:
+  /utils/encode/{num}:
     get:
       tags:
         - "Утилиты"
@@ -61,7 +61,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResponseData'
                 
-  /decode/{link}:
+  /utils/decode/{link}:
     get:
       tags:
         - "Утилиты"
