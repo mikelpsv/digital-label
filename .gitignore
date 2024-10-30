@@ -1,5 +1,3 @@
 .idea
 .data
-.env
-!.env.sample
 vendor
